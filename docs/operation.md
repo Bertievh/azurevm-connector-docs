@@ -5,7 +5,7 @@ The connector can be used by entering arguments on the command line or using the
 ## AzureVM Job Sub-Type
 The AzureVM connector provides a Job Sub-Type that can be used to simplify job definitions within OpCon.
 
-![jobsubtype](/img/azure_vm_subtype.PNG)
+![jobsubtype](/img/azure_vm_subtype.png)
 
 Select the Task from the drop-down list and enter the required values. Only values associated with the task will be enabled. Once a task has been saved, the task type cannot be changed.
 
