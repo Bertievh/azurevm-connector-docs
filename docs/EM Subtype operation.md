@@ -1,6 +1,18 @@
-# Operation
+---
+sidebar_label: 'EM Subtype Operation'
+---
 
-The connector can be used by entering arguments on the command line or using the job sub-type.
+# Enterprise Manager Sub-type Operation
+
+The Enterprise Manager includes a Windows Azure VM job sub-type for defining the Azure VM jobs. The job sub-type can be accessed by selecting Azure VM from the Job Sub-Type drop down list when the Windows Job Type has been selected. 
+
+Before defining jobs, the global properties AZURE_WINDOWS_SERVERS, AZURE_LINUX_SERVERS and AZURE_SERVER_SIZES should be completed. These global properties hold the definitions that populate the drop-down lists used when creating the definitions to create a virtual machine in the Azure environment.
+
+Name            | Description
+--------------- | -----------
+**AZURE_WINDOWS_SERVERS**  | Create the global property and add the values contained below using a comma to separate them. The doubles quotes surrounding the values must be retained. These values will then be visible in the drop-down list (see List of Windows Virtual Machines). Image names can be added to the drop-down list by editing the property. 
+**AZURE_LINUX_SERVERS**    | Create the global property and add the values contained in below using a comma to separate them. The doubles quotes surrounding the values must be retained. These values will then be visible in the drop-down list (see List of Linux Virtual Machines).
+**AZURE_SERVER_SIZES**     | Create the global property and add the values contained below using a comma to separate them. The doubles quotes surrounding the values must be retained. These values will then be visible in the drop-down list (see List of Virtual Machine Sizes).
 
 ## AzureVM Job Sub-Type
 The AzureVM connector provides a Job Sub-Type that can be used to simplify job definitions within OpCon.
@@ -10,7 +22,7 @@ The AzureVM connector provides a Job Sub-Type that can be used to simplify job d
 Select the Task from the drop-down list and enter the required values. Only values associated with the task will be enabled. Once a task has been saved, the task type cannot be changed.
 
 When creating a virtual machine, select the attribute values from the various drop-down lists. 
-Selecting the type from the **Virtual Machine Type** drop-down list (either Windows or Linux, will popoluate the Image Name drop-down lists with images associated with the Virtual Machine Type). 
+Selecting the type from the **Virtual Machine Type** drop-down list (either Windows or Linux, will populate the Image Name drop-down lists with images associated with the Virtual Machine Type). 
 Select the region from the **Region** drop-down list.
 Select the image that will be used to create the virtual machine from the **Image Name** drop-down list.
 If the image is a custom image, check the **Custom Image** checkbox. When selecting a custom image, a Disk Size is not required and the image size should match the size used when creating the custom image.
