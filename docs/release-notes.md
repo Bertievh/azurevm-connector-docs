@@ -1,8 +1,4 @@
----
-sidebar_label: 'Release Notes'
----
-
-# AzureVM Connector Release Notes
+# Release Notes
 
 ## General
 

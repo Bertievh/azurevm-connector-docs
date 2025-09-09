@@ -1,7 +1,3 @@
----
-sidebar_label: 'SM Subtype Operation'
----
-
 # Solution Manager Sub-type Operation
 
 It should be noted that all interactions with the Solution Manager sub-type can only be completed using Solution Manager.

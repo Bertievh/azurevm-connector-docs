@@ -1,7 +1,3 @@
----
-sidebar_label: 'EM Subtype Operation'
----
-
 # Enterprise Manager Sub-type Operation
 
 The Enterprise Manager includes a Windows Azure VM job sub-type for defining the Azure VM jobs. The job sub-type can be accessed by selecting Azure VM from the Job Sub-Type drop down list when the Windows Job Type has been selected. 
