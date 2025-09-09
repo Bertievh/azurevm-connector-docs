@@ -3,7 +3,7 @@ module.exports = {
   title: 'SMA Technologies Help',
   tagline: 'Azure-VM Connector',
   url: 'https://help.smatechnologies.com',
-  baseUrl: '/opcon/connectors/azurevm/',
+  baseUrl: '/opcon/connectors/azure-vm/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
