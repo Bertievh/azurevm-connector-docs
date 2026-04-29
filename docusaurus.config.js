@@ -5,7 +5,11 @@ module.exports = {
   url: 'https://help.smatechnologies.com',
   baseUrl: '/opcon/connectors/azure-vm/',
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
+  },
   favicon: 'img/favicon.ico',
   organizationName: 'smatechnologies',
   projectName: 'azurevm-connector-docs',
@@ -28,7 +32,7 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
-          breadcrumbs: false,
+          breadcrumbs: true,
           routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl:
@@ -44,11 +48,5 @@ module.exports = {
       },
     ],
   ],
-  plugins: [
-    [
-      require.resolve('@cmfcmf/docusaurus-search-local'), 
-      {
-      }
-    ],
-  ],
+  //plugins: [[require.resolve('@cmfcmf/docusaurus-search-local'), {}]],
 };

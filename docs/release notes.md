@@ -1,17 +1,29 @@
-# Release Notes
+---
+sidebar_label: 'Release Notes'
+title: Azure VM Connector release notes
+description: "Version history and change details for the Azure VM Connector, including new features, improvements, and bug fixes."
+tags:
+  - Reference
+  - System Administrator
+  - Connectors
+---
+
+# Azure VM Connector release notes
 
 ## General
 
-The AzureVM Connector supports two sub-type options:
+The AzureVM Connector supports two sub-type options.
 
 ### Enterprise Manager
-Enterprise Manager provides a sub-type plugin module that is copied into the Enterprise Manager plugins directory. The plugin provides a simple mechanism to create the commandline options required when executing the connector.
 
-The sub-type exists as a Windows job sub-type **Azure VM**. 
+Enterprise Manager provides a sub-type plug-in module that is copied into the Enterprise Manager plugins directory. The plug-in provides a mechanism to create the command-line options required when running the connector.
+
+The sub-type is available as a Windows job sub-type named **Azure VM**.
 
 ### Solution Manager
-OpCon version 25.0.3 or greater includes the ACS framework. The ACS framework provides the sub-type mechanism supporting the AzureVM connector. It provides a mechanism to centralize the configuration file (Connector.config) within the OpCon environment and provides a wrapper to the AzureVM connector. 
 
-THe supplied integration available from the FTP site in section integrations can be downloaded and the items extracted and copied into the **\\plugins\\ACSAZUREVM** directory. 
+OpCon version 25.0.3 or greater includes the ACS framework. The ACS framework provides the sub-type mechanism for the AzureVM connector. It centralizes the `Connector.config` file within the OpCon environment and provides a wrapper to the AzureVM connector.
 
-The implementation exists as an ACS Agent **AzureVM** and associated job with several task types.
+The supplied integration is available from the FTP site under **integrations**. Download and extract the items, then copy them into the **\\plugins\\ACSAZUREVM** directory.
+
+The implementation is available as an ACS Agent named **AzureVM** with an associated job that provides several task types.

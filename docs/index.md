@@ -1,18 +1,48 @@
 ---
 slug: '/'
 sidebar_label: 'Azure-VM Connector'
+hide_table_of_contents: true
+displayed_sidebar: null
 ---
 
-# Azure VM
+# Azure VM Connector
 
-Azure VM is an OpCon Connector for Windows that uses the Azure Java SDK to interact with Azure virtual machines. 
-Provides tasks to manage virtual machines.
+The Azure VM Connector is an OpCon connector for Windows that uses the Azure Java SDK to interact with Azure virtual machines. It enables OpCon to automate the full lifecycle of Azure VMs as part of scheduled workflows.
 
-![MSAzure Component Overview](../static/img/msazure-component-overview.png)
+<div style={{display: 'flex', gap: '0.75rem', alignItems: 'flex-start', flexWrap: 'wrap', marginTop: '1rem'}}>
 
-- **list**           Provides information on virtual machines in the resourge group (current status, region, ip-addresses & os type)     
-- **create**         Create a virtual machine.
-- **delete**         Delete a virtual machine.
-- **poweroff**       Power off a virtual machine.
-- **restart**        Restart a virtual machine.
-- **start**          Start a virtual Machine.
+<div style={{flex: '1', minWidth: '160px', display: 'flex', flexDirection: 'column', gap: '0.6rem'}}>
+
+<div style={{background: 'var(--ifm-card-background-color)', border: '1px solid var(--ifm-color-emphasis-400)', borderRadius: '10px', padding: '0.75rem 1rem'}}>
+
+### Overview
+
+- [Overview](./overview.md)
+- [Release Notes](./release%20notes.md)
+
+</div>
+
+<div style={{background: 'var(--ifm-card-background-color)', border: '1px solid var(--ifm-color-emphasis-400)', borderRadius: '10px', padding: '0.75rem 1rem'}}>
+
+### Installation
+
+- [Installation](./installation.md)
+
+</div>
+
+</div>
+
+<div style={{flex: '1', minWidth: '160px', display: 'flex', flexDirection: 'column', gap: '0.6rem'}}>
+
+<div style={{background: 'var(--ifm-card-background-color)', border: '1px solid var(--ifm-color-emphasis-400)', borderRadius: '10px', padding: '0.75rem 1rem'}}>
+
+### Operation
+
+- [Enterprise Manager Sub-type](./EM%20Subtype%20operation.md)
+- [Solution Manager Sub-type](./SM%20Subtype%20operation.md)
+
+</div>
+
+</div>
+
+</div>

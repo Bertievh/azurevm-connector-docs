@@ -1,81 +1,102 @@
-# Installation
+---
+sidebar_label: 'Installation'
+title: Azure VM Connector installation
+description: "Step-by-step instructions for installing and configuring the Azure VM Connector, including Enterprise Manager and Solution Manager sub-type setup."
+tags:
+  - Procedural
+  - System Administrator
+  - Connectors
+---
 
-The Azure VM Connector installation consists of multiple steps that are required to complete the installation successfully. The connector requires the installation of a Windows Agent.
+# Azure VM Connector installation
 
-## Supported Software Levels
-The following software levels are required to implement the Azure VM Connector.
+**Theme:** Configure | **Audience:** System Administrator
 
-- OpCon Release 25.0.3 or higher (if Solution Manager sub-type required). 
-- OpCon Release 19.0 or higher (if Enterprise Manager sub-type required).
-- OpCon Rest API.
-- Uses an embedded Open-JDK (Version 11).
+## What is it?
+
+The Azure VM Connector installation prepares the connector and OpCon environment to run Azure VM automation jobs. Installation involves placing the connector files on a Windows agent, encrypting Azure account credentials, and configuring either the Enterprise Manager or Solution Manager sub-type.
+
+- Use this procedure when setting up the connector for the first time in your OpCon environment.
+- Use this procedure when adding a new Windows agent or OpCon instance that needs Azure VM automation capability.
+
+## Supported software versions
+
+The following software versions are required to use the Azure VM Connector.
+
+| Component | Minimum Version |
+|---|---|
+| OpCon (Solution Manager sub-type) | 25.0.3 or higher |
+| OpCon (Enterprise Manager sub-type) | 19.0 or higher |
+| OpCon REST API | Required |
+| Java | Embedded OpenJDK 11 (bundled with connector) |
 
 ## Installation
-The installation process consists of the following steps:
 
-- Azure VM Connector Installation.
-- Azure VM Connector Configuration.
-- For Enterprise Manager sub-type installation
-    - Adding Azure VM Connector job subtype to Enterprise Manager.
-    - Creating global properties that sub-type uses.
-- For Solution Manager sub-type installation.
-    - Creating AzureVM scripts.
-    - Creating AzureVM Agent.    
+To install the Azure VM Connector, complete the following steps:
 
-### Azure VM Connector Installation
-The Azure VM connector can be installed on any Windows Server as long as there is an OpCon MSLSAM Agent installed on the Windows Server. 
+1. Install the Azure VM Connector files.
+2. Configure the `Connector.config` file.
+3. Complete the sub-type-specific setup:
+   - For Enterprise Manager: install the job sub-type plug-in and create global properties.
+   - For Solution Manager: create AzureVM scripts and an AzureVM agent definition.
 
-Download AzureVM_Windows.zip file from the desired [release available here](https://github.com/SMATechnologies/azure-vm-java/releases).
+### Install the connector files
 
-After download, extract the zip file to the location you'd like to install the connector to. Once unzipped, everything needed should be located under the root folder of that directory.
+The Azure VM Connector can be installed on any Windows Server that has an OpCon Windows agent installed.
 
-When installing using the Enterprise Manager sub-type, the connector can be installed on any Windows system that contains a Windows agent.
+:::note
+When using the Solution Manager sub-type, the connector must be installed on either the same Windows server as the OpCon installation or the same Windows server as the Relay installation.
+:::
 
-When installing using the Solution Manager sub-type, the connector must be installed on either the same Windows server as the OpCon installation or the same Windows server as the Relay installation.
+To install the connector files, complete the following steps:
 
-After the extraction, the root installation directory contains the connector executable (AzureVM.exe), the encryption software (Encrypt.exe), the Connector.config file and two directories, java and emplugins. 
+1. Download the `AzureVM_Windows.zip` file from the desired [release available here](https://github.com/SMATechnologies/azure-vm-java/releases).
+2. Extract the zip file to the directory where you want to install the connector.
+3. Confirm that the following items are present in the root installation directory after extraction:
+   - `AzureVM.exe` — the connector executable
+   - `Encrypt.exe` — the encryption utility
+   - `Connector.config` — the connector configuration file
+   - `java/` — directory containing the bundled OpenJDK 11
+   - `emplugins/` — directory containing the Enterprise Manager plug-in
 
-The java directory contains the java software required to execute the connector (OpenJDK 11) and the emplugins directory contains the job sub-type plugin for Enterprise Manager.
+### Encrypt credentials using the Encrypt utility
 
-#### Encrypt Utility
-The Encrypt utility uses standard 64 bit encryption.
+The Encrypt utility uses standard 64-bit encryption. Use it to encrypt all credential values before placing them in `Connector.config`.
 
-Supports a -v argument and displays the encrypted value
+To encrypt a value, complete the following steps:
 
-On Windows, example on how to encrypt the value "abcdefg":
+1. Open a command prompt on the Windows server where the connector is installed.
+2. Run the following command, replacing `value` with the text to encrypt:
 
 ```
-EncryptValue.exe -v "abcdefg"
-
+EncryptValue.exe -v "value"
 ```
-#### Azure VM Connector Configuration
-The Azure Vm connector uses a configuration file **Connector.config** that contains the Azure account information.
 
-The account information consists of the subscription ID, the tenant ID, the client ID and secret key. These values can be retrieved from the Azure environment.
+3. Copy the encrypted output. You will use it in the `Connector.config` file.
 
-The connection subsction ID, tenant ID, client ID and the secret key must be encrypted using the **Encrypt.exe** program.
+### Configure the Connector.config file
 
-The encryption tool provides basic encryption capabilities to prevent configuration information from being displayed in clear text.
+The `Connector.config` file stores Azure account credentials and the OpCon API connection details. All credential values must be encrypted before being added to the file.
 
-The connector also connects to the OpCon environment to save virtual machine addresses in global properties. This connection uses a application token when connecting to OpCon through the OpCon Rest-API. The application token must be encrypted using the **Encrypt.exe** program.
+The Azure account information required consists of the subscription ID, the tenant ID, the client ID, and the secret key. Retrieve these values from your Azure environment.
 
-The connector provides a **--setup** switch which can be used to set the OpCon Api information in the Connector.config. An application token of **CONNECTORS** is created and the returned token is encrypted and inserted in Connector.config as OPCONAPI_TOKEN. 
-
-When using this switch the following arguments are required.
- 
-Argument       | Description
--------------- | ---------------
--username      | An OpCon user name that is a member of the ocadm role.
--password      | The password of the OpCon user.
--address       | The address and port number of the OpCon Rest-API server - this information in inserted into the Connector.config as OPCON-ADDRESS.
--tls           | Indicates if the OpCon Rest-API requires a tls connection - this information is inserted into the Connector.config as OPCONAPI_USING_TLS.
+To configure the OpCon API connection automatically, run the `--setup` switch:
 
 ```
 AzureVM.exe --setup -username name -password pwd -address server:port -tls
-
 ```
 
-**Connector.config** file example:
+The `--setup` switch requires the following arguments:
+
+| Argument | Description |
+|---|---|
+| `-username` | An OpCon user name that is a member of the `ocadm` role |
+| `-password` | The password of the OpCon user |
+| `-address` | The address and port number of the OpCon REST API server |
+| `-tls` | Include this flag if the OpCon REST API requires a TLS connection |
+
+The following shows an example `Connector.config` file after setup:
+
 ```
 [CONNECTOR]
 NAME=Azure VM Connector
@@ -91,40 +112,46 @@ KEY = (encrypted value)
 OPCONAPI_ADDRESS = address:port
 OPCONAPI_USING_TLS = True
 OPCONAPI_TOKEN = (encrypted value)
-
 ```
 
-Keyword             | Type | Description
-------------------- | ---- | -----------
-TENANT              | Text | **encrypted value** is the tenant ID encrypted using the using the **Encrypt.exe** program. 
-SUBSCRIPTION        | Text | **encrypted value** is the subscription ID encrypted using the using the **Encrypt.exe** program. 
-CLIENT              | Text | **encrypted value** is the client ID encrypted using the using the **Encrypt.exe** program. 
-KEY                 | Text | **encrypted value** is the secret key encrypted using the using the **Encrypt.exe** program. 
-OPCON_API_ADDRESS   | Text | is the address of the OpCon System and in inserted into the configuration file using the --setup switch on **AzureVM.exe**
-OPCON_API_USING_TLS | Text | indicates if the OpCon System is using tls and in inserted into the configuration file using the --setup switch on **AzureVM.exe**
-OPCON_API_TOKEN     | Text | **encrypted value** is the application token used to connect to the OpCon System and into inserted in the configuration file using
+The configuration keywords are defined as follows:
+
+| Keyword | Type | Description |
+|---|---|---|
+| `TENANT` | Text | The encrypted tenant ID |
+| `SUBSCRIPTION` | Text | The encrypted subscription ID |
+| `CLIENT` | Text | The encrypted client ID |
+| `KEY` | Text | The encrypted secret key |
+| `OPCON_API_ADDRESS` | Text | The OpCon REST API address. Set by the `--setup` switch |
+| `OPCON_API_USING_TLS` | Text | Whether the OpCon REST API uses TLS. Set by the `--setup` switch |
+| `OPCON_API_TOKEN` | Text | The encrypted application token. Set by the `--setup` switch |
 
 ### Enterprise Manager sub-type installation
 
-Copy the Enterprise Manager plug-in from the ***installation_dir***\\emplugins directory to the dropins directory of the Enterprise Manager installation. 
+To install the Enterprise Manager sub-type, complete the following steps:
 
-If the dropins directory does not exist, create the dropins directory off the root directory. 
+1. Copy the Enterprise Manager plug-in from the `<installation_dir>\emplugins` directory to the `dropins` directory of your Enterprise Manager installation. Create the `dropins` directory if it does not exist.
+2. Restart Enterprise Manager. The **Azure VM** Windows job sub-type will be visible.
 
-Restart Enterprise Manager and a new Windows job subtype called Azure VM will be visible.
+:::note
+If the sub-type does not appear, restart Enterprise Manager using **Run as Administrator**. After this step, Enterprise Manager can be used normally.
+:::
 
-If not restart Enterprise Manager using 'Run as Administrator'. After this Enterprise Manager can be used normally.
+#### Create the AzureVmPath global property
 
-### Create AzureVmPath Global Property
-Create a global property **AzureVmPath** that contains the full path of the installation directory.
+Create a global property named `AzureVmPath` that contains the full path of the connector installation directory.
 
-### Create Special Properties
-The Azure VM connector uses three global properties to hold the values of images and the associated sizes.
+#### Create special global properties
 
-Name                       | Description
--------------------------- | -----------
-**AZURE_WINDOWS_SERVERS**  | Create the global property and add the values contained below using a comma to separate them. The doubles quotes surrounding the values must be retained. These values will then be visible in the drop-down list (see List of Windows Virtual Machines). Image names can be added to the drop-down list by editing the property. 
-**AZURE_LINUX_SERVERS**    | Create the global property and add the values contained in below using a comma to separate them. The doubles quotes surrounding the values must be retained. These values will then be visible in the drop-down list (see List of Linux Virtual Machines).
-**AZURE_SERVER_SIZES**     | Create the global property and add the values contained below using a comma to separate them. The doubles quotes surrounding the values must be retained. These values will then be visible in the drop-down list (see List of Virtual Machine Sizes).
+The Azure VM Connector uses three global properties to populate drop-down lists when creating virtual machine job definitions.
+
+| Property | Description |
+|---|---|
+| `AZURE_WINDOWS_SERVERS` | Comma-separated list of Windows VM image names. Double quotes surrounding each value must be retained. |
+| `AZURE_LINUX_SERVERS` | Comma-separated list of Linux VM image names. Double quotes surrounding each value must be retained. |
+| `AZURE_SERVER_SIZES` | Comma-separated list of VM size names. Double quotes surrounding each value must be retained. |
+
+Sample values for each property are provided in the lists below.
 
 ```
 List of Windows Virtual Machines 
@@ -139,57 +166,67 @@ List of Linux Virtual Machines
 
 List of Virtual Machine Sizes
 
-"Standard_A0","Standard_A1","Standard_A2","Standard_A3","Standard_A5","Standard_A4","Standard_A6","Standard_A7”,“Basic_A0”,“Basic_A1”,“Basic_A2”,“Basic_A3”,“Basic_A4","Standard_D1_v2","Standard_D2_v2","Standard_D3_v2","Standard_D4_v2","Standard_D5_v2","Standard_D11_v2","Standard_D12_v2","Standard_D13_v2","Standard_D14_v2","Standard_D15_v2","Standard_D2_v2_Promo","Standard_D3_v2_Promo","Standard_D4_v2_Promo","Standard_D5_v2_Promo","Standard_D11_v2_Promo","Standard_D12_v2_Promo","Standard_D13_v2_Promo","Standard_D14_v2_Promo","Standard_F1","Standard_F2","Standard_F4","Standard_F8","Standard_F16","Standard_A1_v2","Standard_A2m_v2","Standard_A2_v2","Standard_A4m_v2","Standard_A4_v2","Standard_A8m_v2","Standard_A8_v2","Standard_DS1","Standard_DS2","Standard_DS3","Standard_DS4","Standard_DS11","Standard_DS12","Standard_DS13","Standard_DS14","Standard_D2_v3","Standard_D4_v3","Standard_D8_v3","Standard_D16_v3","Standard_D32_v3","Standard_D1","Standard_D2","Standard_D3","Standard_D4","Standard_D11","Standard_D12","Standard_D13","Standard_D14","Standard_B1ms","Standard_B1s","Standard_B2ms","Standard_B2s","Standard_B4ms","Standard_B8ms","Standard_DS1_v2","Standard_DS2_v2","Standard_DS3_v2","Standard_DS4_v2","Standard_DS5_v2","Standard_DS11-1_v2","Standard_DS11_v2","Standard_DS12-1_v2","Standard_DS12-2_v2","Standard_DS12_v2","Standard_DS13-2_v2","Standard_DS13-4_v2","Standard_DS13_v2","Standard_DS14-4_v2","Standard_DS14-x8_v2","Standard_DS14_v2","Standard_DS2_v2_Promo","Standard_DS3_v2_Promo","Standard_DS4_v2_Promo","Standard_DS5_v2_Promo","Standard_DS11_v2_Promo","Standard_DS12_v2_Promo","Standard_DS13_v2_Promo","Standard_DS14_v2_Promo","Standard_F1s","Standard_F2s","Standard_F4s","Standard_F8s","Standard_F16s","Standard_D64_v3","Standard_D2s_v3","Standard_D4s_v3","Standard_D8s_v3","Standard_D16s_v3","Standard_D32s_v3","Standard_D64s_v3","Standard_E2_v3","Standard_E4_v3","Standard_E8_v3","Standard_E16_v3","Standard_E20_v3","Standard_E32_v3","Standard_E64i_v3","Standard_E64_v3","Standard_E2s_v3","Standard_E4-2s_v3","Standard_E4s_v3","Standard_E8-2s_v3","Standard_E8-4s_v3","Standard_E8s_v3","Standard_E16-4s_v3","Standard_E16-8s_v3","Standard_E16s_v3","Standard_E20s_v3","Standard_E32-8s_v3","Standard_E32-16s_v3","Standard_E32s_v3","Standard_E64-16s_v3","Standard_E64-32s_v3","Standard_E64is_v3","Standard_E64s_v3","Standard_DS15_v2","Standard_F2s_v2","Standard_F4s_v2","Standard_F8s_v2","Standard_F16s_v2","Standard_F32s_v2","Standard_F64s_v2",
+"Standard_A0","Standard_A1","Standard_A2","Standard_A3","Standard_A5","Standard_A4","Standard_A6","Standard_A7","Basic_A0","Basic_A1","Basic_A2","Basic_A3","Basic_A4","Standard_D1_v2","Standard_D2_v2","Standard_D3_v2","Standard_D4_v2","Standard_D5_v2","Standard_D11_v2","Standard_D12_v2","Standard_D13_v2","Standard_D14_v2","Standard_D15_v2","Standard_D2_v2_Promo","Standard_D3_v2_Promo","Standard_D4_v2_Promo","Standard_D5_v2_Promo","Standard_D11_v2_Promo","Standard_D12_v2_Promo","Standard_D13_v2_Promo","Standard_D14_v2_Promo","Standard_F1","Standard_F2","Standard_F4","Standard_F8","Standard_F16","Standard_A1_v2","Standard_A2m_v2","Standard_A2_v2","Standard_A4m_v2","Standard_A4_v2","Standard_A8m_v2","Standard_A8_v2","Standard_DS1","Standard_DS2","Standard_DS3","Standard_DS4","Standard_DS11","Standard_DS12","Standard_DS13","Standard_DS14","Standard_D2_v3","Standard_D4_v3","Standard_D8_v3","Standard_D16_v3","Standard_D32_v3","Standard_D1","Standard_D2","Standard_D3","Standard_D4","Standard_D11","Standard_D12","Standard_D13","Standard_D14","Standard_B1ms","Standard_B1s","Standard_B2ms","Standard_B2s","Standard_B4ms","Standard_B8ms","Standard_DS1_v2","Standard_DS2_v2","Standard_DS3_v2","Standard_DS4_v2","Standard_DS5_v2","Standard_DS11-1_v2","Standard_DS11_v2","Standard_DS12-1_v2","Standard_DS12-2_v2","Standard_DS12_v2","Standard_DS13-2_v2","Standard_DS13-4_v2","Standard_DS13_v2","Standard_DS14-4_v2","Standard_DS14-x8_v2","Standard_DS14_v2","Standard_DS2_v2_Promo","Standard_DS3_v2_Promo","Standard_DS4_v2_Promo","Standard_DS5_v2_Promo","Standard_DS11_v2_Promo","Standard_DS12_v2_Promo","Standard_DS13_v2_Promo","Standard_DS14_v2_Promo","Standard_F1s","Standard_F2s","Standard_F4s","Standard_F8s","Standard_F16s","Standard_D64_v3","Standard_D2s_v3","Standard_D4s_v3","Standard_D8s_v3","Standard_D16s_v3","Standard_D32s_v3","Standard_D64s_v3","Standard_E2_v3","Standard_E4_v3","Standard_E8_v3","Standard_E16_v3","Standard_E20_v3","Standard_E32_v3","Standard_E64i_v3","Standard_E64_v3","Standard_E2s_v3","Standard_E4-2s_v3","Standard_E4s_v3","Standard_E8-2s_v3","Standard_E8-4s_v3","Standard_E8s_v3","Standard_E16-4s_v3","Standard_E16-8s_v3","Standard_E16s_v3","Standard_E20s_v3","Standard_E32-8s_v3","Standard_E32-16s_v3","Standard_E32s_v3","Standard_E64-16s_v3","Standard_E64-32s_v3","Standard_E64is_v3","Standard_E64s_v3","Standard_DS15_v2","Standard_F2s_v2","Standard_F4s_v2","Standard_F8s_v2","Standard_F16s_v2","Standard_F32s_v2","Standard_F64s_v2",
 "Standard_F72s_v2","Standard_G1","Standard_G2","Standard_G3","Standard_G4","Standard_G5","Standard_GS1","Standard_GS2","Standard_GS3","Standard_GS4","Standard_GS4-4","Standard_GS4-8","Standard_GS5","Standard_GS5-8","Standard_GS5-16","Standard_L4s","Standard_L8s","Standard_L16s","Standard_L32s"
-
 ```
 
 ### Solution Manager sub-type installation
 
-It should be noted that all interactions with the Solution Manager sub-type can only be completed using Solution Manager.
+:::note
+All interactions with the Solution Manager sub-type must be completed using Solution Manager.
+:::
 
-Download the ACSAZUREVM zip file from the ftp site under **OpCon Releases\\Integrations\\AZUREVM**.
+To install the Solution Manager sub-type, complete the following steps:
 
-Extract the **ACSAZUREVM** directory and copy this into the **\\SAM\\plugins** for OpCon and relay installations.
-
-For OpCon installations stop and restart the **SMA OpCon RestAPI** and **SMA OpCon Service Manager** services, for Relay stop and restart the **Relay Service**.
+1. Download the `ACSAZUREVM` zip file from the FTP site under **OpCon Releases\\Integrations\\AZUREVM**.
+2. Extract the `ACSAZUREVM` directory and copy it into the `\SAM\plugins` directory for OpCon and Relay installations.
+3. Restart the required services:
+   - For OpCon installations: stop and restart the **SMA OpCon RestAPI** and **SMA OpCon Service Manager** services.
+   - For Relay installations: stop and restart the **Relay Service**.
 
 #### Create the scripts
-When using the Solution Manager sub-type, two scripts must be created. The first script contains the Connector.config information and the second script contains the drop-down list information.
 
-Using Solution Manager
-- Select **Library**.
-- Select **Scripts**.
-- Select **Script Types** from the upper right hand corner. 
-    - Select **+Add**
-    - In the ***Name*** field enter **ACSAZUREVM**.
-    - In the ***File Extension field*** enter **txt**.
-    - In the ***Description*** field enter **Used for ACSAZUREVM Integration**.
-    - Select Save.
-- Select **Script Runners** from the upper right hand corner. 
-    - Select **+Add**
-    - In the ***Name*** field enter **ACSAZUREVM**.
-    - In the ***OS*** field select **AzureVM** from the drop-down list.
-    - In the ***Type*** field select **ACSAZUREVM** from the drop-down list.
-    - In the ***Command*** field enter **cmd.exe /c**.
-    - Select Save.
-- Select **Scripts** from the upper right hand corner.
-    - Create the Connector.config script.
-    - Select **+Add**.
-    - In the ***Name*** field enter a name for the script. It is suggested using the proposed agent name and append **_config** to the name. 
-    - In the ***Type*** field select **ACSAZUREVM** from the drop-down list.
-    - Assign the required roles.
-    - In the ***Script*** paste the contents of the created Connector.config file.
-    - Select Save.
-    - Create the drop-down information script.
-    - Select **+Add**.
-    - In the ***Name*** field enter a name for the script. It is suggested using the proposed agent name and append **_data** to the name. 
-    - In the ***Type*** field select **ACSAZUREVM** from the drop-down list.
-    - Assign the required roles.
-    - In the ***Script*** paste the information below.
-    - Select Save.
+When using the Solution Manager sub-type, two scripts must be created: one containing the `Connector.config` information and one containing the drop-down list information.
 
-The information for the _data script is provided below. Additional information can be added to the script by using the key names IMAGE, SIZE and REGION and the required values. The data values are passed each time a job is defined.
+To create the required script type and runner, complete the following steps:
+
+1. In Solution Manager, select **Library**.
+2. Select **Scripts**.
+3. Select **Script Types** from the upper right.
+   1. Select **+Add**.
+   2. In the **Name** field, enter `ACSAZUREVM`.
+   3. In the **File Extension** field, enter `txt`.
+   4. In the **Description** field, enter `Used for ACSAZUREVM Integration`.
+   5. Select **Save**.
+4. Select **Script Runners** from the upper right.
+   1. Select **+Add**.
+   2. In the **Name** field, enter `ACSAZUREVM`.
+   3. In the **OS** field, select **AzureVM**.
+   4. In the **Type** field, select **ACSAZUREVM**.
+   5. In the **Command** field, enter `cmd.exe /c`.
+   6. Select **Save**.
+
+To create the Connector.config script, complete the following steps:
+
+1. In Solution Manager, select **Library** > **Scripts**.
+2. Select **Scripts** from the upper right, then select **+Add**.
+3. In the **Name** field, enter a name. Use the proposed agent name with `_config` appended.
+4. In the **Type** field, select **ACSAZUREVM**.
+5. Assign the required roles.
+6. In the **Script** field, paste the contents of your `Connector.config` file.
+7. Select **Save**.
+
+To create the drop-down information script, complete the following steps:
+
+1. In Solution Manager, select **Library** > **Scripts**.
+2. Select **Scripts** from the upper right, then select **+Add**.
+3. In the **Name** field, enter a name. Use the proposed agent name with `_data` appended.
+4. In the **Type** field, select **ACSAZUREVM**.
+5. Assign the required roles.
+6. In the **Script** field, paste the data script content provided below.
+7. Select **Save**.
+
+The data script content defines the available types, regions, images, and sizes. Additional values can be added using the same `KEY value` format.
 
 ```
 TYPE Windows
@@ -258,7 +295,6 @@ IMAGE Canonical_UbuntuServer_12.04.5-LTS
 IMAGE Canonical_UbuntuServer_14.04.0-LTS
 IMAGE Canonical_UbuntuServer_14.04.1-LTS
 IMAGE Canonical_UbuntuServer_14.04.2-LTS
-IMAGE Canonical_UbuntuServer_14.04.2-LTS
 IMAGE Canonical_UbuntuServer_14.04.3-LTS
 IMAGE Canonical_UbuntuServer_14.04.4-LTS
 IMAGE Canonical_UbuntuServer_14.04.5-LTS
@@ -276,7 +312,6 @@ IMAGE RedHat_RHEL_7.4
 IMAGE RedHat_RHEL_7.5
 IMAGE SUSE_SLES_11-SP4
 IMAGE SUSE_SLES_12-SP4
-IMAGE SUSE_SLES_15
 IMAGE SUSE_SLES_15
 IMAGE MicrosoftSQLServer_SQL2017-RHEL7_Enterprise
 IMAGE MicrosoftSQLServer_SQL2017-RHEL7_Express
@@ -442,27 +477,51 @@ SIZE Standard_L4s
 SIZE Standard_L8s
 SIZE Standard_L16s
 SIZE Standard_L32s
-
 ```
-#### Create AzureVM Agent Definition
 
-Using Solution Manager
-- Select **Library**.
-- Select **Agents**.
-    - Select **+Add**
-    - In the ***Name*** field enter the name of the agent.
-    - Select **AzureVM** from the ***Type*** drop-down list.
-    - In the ***AzureVM Settings*** section enter the required information.
-    - In the ***Client Information*** section
-        - In the ***Directory*** field enter the installation directory of the AzureVM Connector.
-        - In the ***Name*** field insert **AzureVM.exe** (default value).
-        - In the ***Config File Name*** field insert **Connector.config** (default value).
-    - In the ***Config Script*** section
-        - Select **ACSAZUREVM** from the ***Script Runner*** drop-down list.
-        - Select the config script you previously created from the ***Script*** drop-down list.
-    - In the ***Drop-down Script*** section
-        - Select **ACSAZUREVM** from the ***Script Runner*** drop-down list.
-        - Select the data script you previously created from the ***Script*** drop-down list.
-    - In the ***Name*** field enter the name of the agent.
+#### Create the AzureVM agent definition
 
-- Select **Save**.
+To create the AzureVM agent in Solution Manager, complete the following steps:
+
+1. In Solution Manager, select **Library** > **Agents**.
+2. Select **+Add**.
+3. In the **Name** field, enter the name of the agent.
+4. From the **Type** list, select **AzureVM**.
+5. In the **AzureVM Settings** section, enter the required information.
+6. In the **Client Information** section:
+   - In the **Directory** field, enter the installation directory of the AzureVM Connector.
+   - In the **Name** field, enter `AzureVM.exe`.
+   - In the **Config File Name** field, enter `Connector.config`.
+7. In the **Config Script** section:
+   - From the **Script Runner** list, select **ACSAZUREVM**.
+   - From the **Script** list, select the config script you created.
+8. In the **Drop-down Script** section:
+   - From the **Script Runner** list, select **ACSAZUREVM**.
+   - From the **Script** list, select the data script you created.
+9. Select **Save**.
+
+## FAQs
+
+**Do I need to encrypt all values in Connector.config?**
+Yes. The tenant ID, subscription ID, client ID, secret key, and OpCon API token must all be encrypted using `EncryptValue.exe` before being placed in `Connector.config`. The `--setup` switch encrypts and inserts the OpCon API token automatically.
+
+**What happens if I install the Enterprise Manager plug-in and the Azure VM sub-type does not appear?**
+Restart Enterprise Manager using **Run as Administrator**. If the sub-type still does not appear, confirm that the plug-in `.jar` file was copied to the correct `dropins` directory and that Enterprise Manager was fully restarted.
+
+**Can I run multiple Azure VM Connector instances on the same server?**
+Yes. Each connector instance requires its own installation directory and its own `Connector.config` file configured with the appropriate Azure account credentials.
+
+**Is the connector compatible with all Azure regions?**
+The connector supports all Azure regions listed in the data script. Additional regions can be added to the data script using the `REGION region-name` format.
+
+## Glossary
+
+**ACS framework** — The Agent Configuration Service framework in OpCon 25.0.3 and later that centralizes connector configuration within OpCon and provides a wrapper for ACS-compatible connectors.
+
+**Connector.config** — The configuration file used by the Azure VM Connector to store encrypted Azure account credentials and OpCon API connection settings.
+
+**EncryptValue.exe** — The encryption utility bundled with the Azure VM Connector. It accepts a plaintext value and returns a 64-bit encrypted string for use in `Connector.config`.
+
+**ACSAZUREVM** — The script type and runner name used to integrate the Azure VM Connector with the Solution Manager ACS framework.
+
+**dropins** — The Enterprise Manager plug-in discovery directory. Plug-in files placed here are loaded automatically when Enterprise Manager starts.
